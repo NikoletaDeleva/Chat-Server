@@ -7,40 +7,41 @@ import java.util.Scanner;
 
 public class ClientProgram implements SocketListener {
     @Override
-    public void onConnected(Channel channel) {
+    public void onConnected(final Channel channel) {
 	System.out.println("Connected.");
     }
 
     @Override
-    public void onDisconnected(Channel channel) {
+    public void onDisconnected(final Channel channel) {
 	System.out.println("Disconnected.");
     }
 
     @Override
-    public void onReceived(Channel channel, String msg) {
+    public void onReceived(final Channel channel, final String msg) {
 	System.out.println(msg);
     }
 
     public void start() throws UnknownHostException, IOException {
-	Scanner scanner = new Scanner(System.in);
+	final Scanner scanner = new Scanner(System.in);
 
 	System.out.print("Name : ");
-	String name = scanner.nextLine();
+	final String name = scanner.nextLine();
 
 	System.out.print("Port : ");
-	int port = Integer.parseInt(scanner.nextLine());
+	final int port = Integer.parseInt(scanner.nextLine());
 
-	Socket socket = new Socket("localhost", port);
+	final Socket socket = new Socket("localhost", port);
 	System.out.println("Connected");
 
-	Channel channel = new Channel(socket, this);
+	final Channel channel = new Channel(socket, this);
 	channel.start();
 
 	while (true) {
-	    String msg = scanner.nextLine();
+	    final String msg = scanner.nextLine();
 
-	    if (msg.isEmpty())
+	    if (msg.isEmpty()) {
 		break;
+	    }
 
 	    channel.send(name + " >> " + msg);
 	}
@@ -52,7 +53,7 @@ public class ClientProgram implements SocketListener {
     }
 
     public static void main(String[] args) throws UnknownHostException, IOException {
-	ClientProgram program = new ClientProgram();
+	final ClientProgram program = new ClientProgram();
 	program.start();
     }
 

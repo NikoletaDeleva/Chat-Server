@@ -1,9 +1,9 @@
 package com.egtinteractive.chatserver;
 
 public interface SocketListener {
-    void onConnected(Channel channel);
+    public void onConnected(final Channel channel);
 
-    void onDisconnected(Channel channel);
+    public void onDisconnected(final Channel channel);
 
-    void onReceived(Channel channel, String msg);
+    public void onReceived(final Channel channel, final String msg);
 }

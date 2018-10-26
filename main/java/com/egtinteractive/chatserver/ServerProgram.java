@@ -8,68 +8,68 @@ public class ServerProgram implements SocketListener {
     private Server server;
 
     @Override
-    public void onConnected(Channel channel) {
-	Socket socket = channel.getSocket();
-	String hostName = socket.getInetAddress().getHostName();
-	int port = socket.getPort();
+    public void onConnected(final Channel channel) {
+	final Socket socket = channel.getSocket();
+	final String hostName = socket.getInetAddress().getHostName();
+	final int port = socket.getPort();
 
-	String msg = "Client connected from " + hostName + ":" + port;
+	final String msg = "Client connected from " + hostName + ":" + port;
 	System.out.println(msg);
 
-	for (Channel c : server.getChannels()) {
+	for (Channel c : this.server.getChannels()) {
 	    if (c != channel)
 		c.send(msg);
 	}
     }
 
     @Override
-    public void onDisconnected(Channel channel) {
-	server.remove(channel);
+    public void onDisconnected(final Channel channel) {
+	this.server.remove(channel);
 
-	Socket socket = channel.getSocket();
-	String hostName = socket.getInetAddress().getHostName();
-	int port = socket.getPort();
+	final Socket socket = channel.getSocket();
+	final String hostName = socket.getInetAddress().getHostName();
+	final int port = socket.getPort();
 
-	String msg = "Client disconnected from " + hostName + ":" + port;
+	final String msg = "Client disconnected from " + hostName + ":" + port;
 	System.out.println();
 
-	server.broadcast(msg);
+	this.server.broadcast(msg);
     }
 
     @Override
-    public void onReceived(Channel channel, String msg) {
+    public void onReceived(final Channel channel, final String msg) {
 	System.out.println(msg);
-	server.broadcast(msg);
+	this.server.broadcast(msg);
     }
 
     public void start() throws IOException {
-	Scanner scanner = new Scanner(System.in);
+	final Scanner scanner = new Scanner(System.in);
 
 	System.out.print("Port : ");
-	int port = Integer.parseInt(scanner.nextLine());
+	final int port = Integer.parseInt(scanner.nextLine());
 
-	server = new Server(this);
-	server.bind(port); 
-	server.start(); 
+	this.server = new Server(this);
+	this.server.bind(port);
+	this.server.start();
 	System.out.println("Server has started.");
 
 	while (true) {
-	    String msg = scanner.nextLine();
+	    final String msg = scanner.nextLine();
 
-	    if (msg.isEmpty())
+	    if (msg.isEmpty()) {
 		break;
-
-	    server.broadcast("Server >> " + msg);
+	    }
+	    this.server.broadcast("Server >> " + msg);
 	}
 
 	scanner.close();
-	server.stop();
+	this.server.stop();
 
 	System.out.println("Server has closed.");
     }
 
     public static void main(String[] args) throws IOException {
-	ServerProgram program = new ServerProgram();
+	final ServerProgram program = new ServerProgram();
 	program.start();
     }
 }

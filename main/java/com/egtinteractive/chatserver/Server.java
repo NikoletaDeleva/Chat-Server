@@ -14,37 +14,38 @@ public class Server implements Runnable {
 
     private SocketListener socketListener;
 
-    public Server(SocketListener socketListener) {
+    public Server(final SocketListener socketListener) {
 	this.socketListener = socketListener;
     }
 
-    public void bind(int port) throws IOException {
+    public void bind(final int port) throws IOException {
 	this.serverSocket = new ServerSocket(port);
     }
 
     public void start() {
-	Thread thread = new Thread(this);
+	final Thread thread = new Thread(this);
 	thread.start();
     }
 
     public void stop() throws IOException {
-	running = false;
-	serverSocket.close();
+	this.running = false;
+	this.serverSocket.close();
     }
 
     @Override
     public void run() {
-	channels = new ArrayList<>();
+	this.channels = new ArrayList<>();
 
-	running = true;
-	while (running) {
+	this.running = true;
+
+	while (this.running) {
 	    try {
-		Socket socket = serverSocket.accept();
+		final Socket socket = this.serverSocket.accept();
 
-		Channel channel = new Channel(socket, socketListener);
+		final Channel channel = new Channel(socket, this.socketListener);
 		channel.start();
 
-		channels.add(channel);
+		this.channels.add(channel);
 	    } catch (SocketException e) {
 		break;
 	    } catch (IOException e) {
@@ -53,33 +54,35 @@ public class Server implements Runnable {
 	}
 
 	try {
-	    for (Channel channel : channels) {
+	    for (Channel channel : this.channels) {
 		channel.stop();
 	    }
 
-	    channels.clear();
+	    this.channels.clear();
 	} catch (IOException e) {
 	    e.printStackTrace();
 	}
     }
 
-    public void broadcast(String msg) {
-	if (!running)
+    public void broadcast(final String msg) {
+	if (!this.running) {
 	    return;
+	}
 
 	for (Channel channel : channels) {
 	    channel.send(msg);
 	}
     }
 
-    public void remove(Channel channel) {
-	if (!running)
+    public void remove(final Channel channel) {
+	if (!this.running) {
 	    return;
+	}
 
-	channels.remove(channel);
+	this.channels.remove(channel);
     }
 
     public ArrayList<Channel> getChannels() {
-	return channels;
+	return this.channels;
     }
 }
