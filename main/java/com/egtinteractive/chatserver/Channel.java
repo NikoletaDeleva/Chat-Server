@@ -16,11 +16,11 @@ public class Channel implements Runnable {
 
     private boolean running;
 
-    private SocketListener onSocketListener;
+    private SocketListener socketListener;
 
-    public Channel(Socket socket, SocketListener onSocketListener) {
+    public Channel(Socket socket, SocketListener socketListener) {
 	this.socket = socket;
-	this.onSocketListener = onSocketListener;
+	this.socketListener = socketListener;
     }
 
     public void start() {
@@ -45,23 +45,23 @@ public class Channel implements Runnable {
 	    InputStream inputStream = socket.getInputStream();
 	    reader = new Scanner(inputStream);
 
-	    if (null != onSocketListener)
-		onSocketListener.onConnected(this);
+	    if (null != socketListener)
+		socketListener.onConnected(this);
 
 	    running = true;
 	    while (running) {
 		try {
 		    String msg = reader.nextLine();
 
-		    if (null != onSocketListener)
-			onSocketListener.onReceived(this, msg);
+		    if (null != socketListener)
+			socketListener.onReceived(this, msg);
 		} catch (NoSuchElementException e) {
 		    break;
 		}
 	    }
 
-	    if (null != onSocketListener)
-		onSocketListener.onDisconnected(this);
+	    if (null != socketListener)
+		socketListener.onDisconnected(this);
 	} catch (IOException e) {
 	    e.printStackTrace();
 	}

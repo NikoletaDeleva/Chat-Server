@@ -3,14 +3,9 @@ package com.egtinteractive.chatserver;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
-import java.util.concurrent.ConcurrentHashMap;
 
-public class ClientProgram implements SocketListener {; 
-    private Map<String, List<String>> rooms = new ConcurrentHashMap<>();
-    
+public class ClientProgram implements SocketListener {
     @Override
     public void onConnected(Channel channel) {
 	System.out.println("Connected.");
@@ -32,19 +27,9 @@ public class ClientProgram implements SocketListener {;
 	System.out.print("Name : ");
 	String name = scanner.nextLine();
 
-	System.out.print("Room : ");
-	String room = scanner.nextLine();
-	int port = room.hashCode();
-	
-	if(!isExistingRoom(room)) {
-	    ServerProgram server = new ServerProgram(port);
-	    server.addNewClient(name); 
-	    rooms.put(room, server.getClients());
-	    server.start();
-	}else {
-	    rooms.get(room).add(name);
-	}
-	
+	System.out.print("Port : ");
+	int port = Integer.parseInt(scanner.nextLine());
+
 	Socket socket = new Socket("localhost", port);
 	System.out.println("Connected");
 
@@ -65,8 +50,10 @@ public class ClientProgram implements SocketListener {;
 
 	System.out.println("Closed");
     }
-    
-    public boolean isExistingRoom(String room) {
- 	return rooms.containsKey(room);
-     }
+
+    public static void main(String[] args) throws UnknownHostException, IOException {
+	ClientProgram program = new ClientProgram();
+	program.start();
+    }
+
 }

@@ -2,26 +2,18 @@ package com.egtinteractive.chatserver;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class ServerProgram implements SocketListener {
     private Server server;
-    private int port;
-    private List<String> clients;
-    
- 
-public ServerProgram(int port) {
-	this.port = port;
-	this.clients = new ArrayList<>();
-    }
+
     @Override
     public void onConnected(Channel channel) {
 	Socket socket = channel.getSocket();
 	String hostName = socket.getInetAddress().getHostName();
+	int port = socket.getPort();
 
-	String msg = "Client connected from " + hostName + ":" + this.port;
+	String msg = "Client connected from " + hostName + ":" + port;
 	System.out.println(msg);
 
 	for (Channel c : server.getChannels()) {
@@ -36,8 +28,9 @@ public ServerProgram(int port) {
 
 	Socket socket = channel.getSocket();
 	String hostName = socket.getInetAddress().getHostName();
+	int port = socket.getPort();
 
-	String msg = "Client disconnected from " + hostName + ":" + this.port;
+	String msg = "Client disconnected from " + hostName + ":" + port;
 	System.out.println();
 
 	server.broadcast(msg);
@@ -49,16 +42,16 @@ public ServerProgram(int port) {
 	server.broadcast(msg);
     }
 
-    public List<String> getClients() {
-	return clients;
-    }
-
     public void start() throws IOException {
 	Scanner scanner = new Scanner(System.in);
 
+	System.out.print("Port : ");
+	int port = Integer.parseInt(scanner.nextLine());
+
 	server = new Server(this);
-	server.start();
-	System.out.println("New room created!");
+	server.bind(port); 
+	server.start(); 
+	System.out.println("Server has started.");
 
 	while (true) {
 	    String msg = scanner.nextLine();
@@ -75,9 +68,8 @@ public ServerProgram(int port) {
 	System.out.println("Server has closed.");
     }
 
-    public void addNewClient(String name) {
-	this.clients.add(name);
+    public static void main(String[] args) throws IOException {
+	ServerProgram program = new ServerProgram();
+	program.start();
     }
-    
-    
 }
