@@ -1,88 +1,84 @@
 package com.egtinteractive.chatserver;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
-import java.util.ArrayList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class Server implements Runnable {
-    private boolean running;
-
+public class Server {
+    private final static String QUIT_COMMAND = "-quit";
+    private final static String HOST = "localhost"; 
+    private final static int PORT = 1111;
+    private final Map<String, ChatRoom> chatRooms;
     private ServerSocket serverSocket;
-    private ArrayList<Channel> channels;
 
-    private SocketListener socketListener;
-
-    public Server(final SocketListener socketListener) {
-	this.socketListener = socketListener;
-    }
-
-    public void bind(final int port) throws IOException {
-	this.serverSocket = new ServerSocket(port);
+    public Server() {
+	this.chatRooms = new ConcurrentHashMap<>();
+	chatRooms.put("Defalut", new ChatRoom("Default"));
     }
 
     public void start() {
-	final Thread thread = new Thread(this);
-	thread.start();
-    }
+	try {
+	    final InetAddress address = InetAddress.getByName(HOST);
+	   
 
-    public void stop() throws IOException {
-	this.running = false;
-	this.serverSocket.close();
-    }
+	    this.serverSocket = new ServerSocket(PORT, 100, address);
 
-    @Override
-    public void run() {
-	this.channels = new ArrayList<>();
+	    System.out.println("Listening on " + serverSocket);
 
-	this.running = true;
+	    while (!Thread.currentThread().isInterrupted()) {
 
-	while (this.running) {
-	    try {
-		final Socket socket = this.serverSocket.accept();
+		final Socket newSocket = serverSocket.accept();
+		System.out.println("Connection established.");
 
-		final Channel channel = new Channel(socket, this.socketListener);
-		channel.start();
+		final Client newClient = new Client(newSocket);
 
-		this.channels.add(channel);
-	    } catch (SocketException e) {
-		break;
-	    } catch (IOException e) {
-		break;
+		new ClientThread(newClient, this).start();
 	    }
+
+	} catch (IOException e) {
+	    System.out.println("Server stopped!");
+	    e.printStackTrace();
+	} finally {
+	    stop();
 	}
 
-	try {
-	    for (Channel channel : this.channels) {
-		channel.stop();
-	    }
+    }
 
-	    this.channels.clear();
+    private void stop() {
+	try {
+	    for (ChatRoom room : chatRooms.values()) {
+		room.closeRoom();
+	    }
+	    serverSocket.close();
+
 	} catch (IOException e) {
 	    e.printStackTrace();
 	}
     }
 
-    public void broadcast(final String msg) {
-	if (!this.running) {
-	    return;
+    boolean putClientInRoom(final String selectedRoom, final Client client) {
+
+	if (selectedRoom.contains(QUIT_COMMAND)) {
+	    client.closeClient();
+	    return true;
 	}
 
-	for (Channel channel : channels) {
-	    channel.send(msg);
+	ChatRoom chosenRoom = chatRooms.get(selectedRoom);
+	if (chosenRoom == null) {
+	    chatRooms.put(selectedRoom, new ChatRoom(selectedRoom));
+	    client.sendMsg("You made a new room!");
+	    chosenRoom = chatRooms.get(selectedRoom);
 	}
-    }
+	chosenRoom.addClient(client);
 
-    public void remove(final Channel channel) {
-	if (!this.running) {
-	    return;
-	}
+	client.setRoom(chosenRoom);
+	client.sendMsg("You joined: " + chosenRoom.toString());
 
-	this.channels.remove(channel);
-    }
+	chosenRoom.sendToAll("User " + client.getName() + " joined room.", client.getName());
 
-    public ArrayList<Channel> getChannels() {
-	return this.channels;
+	return true;
     }
 }
