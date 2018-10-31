@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ChatRoom {
     private final String name;
-    private final Map<String, Client> mapClients;
+    private final Map<Integer, Client> mapClients;
 
     public ChatRoom(String name) {
 	this.name = name;
@@ -13,26 +13,26 @@ public class ChatRoom {
     }
 
     public void addClient(final Client client) {
-	mapClients.put(client.getName(), client);
+	mapClients.putIfAbsent(client.getAnonymousNumber(), client);
     }
 
-    void removeClient(final String name) {
+    void removeClient(final Client client) {
 
-	if (mapClients.containsKey(name)) {
-	    mapClients.get(name).closeClient();
-	    mapClients.remove(name);
-	    String quitMsg = "User " + name + " has left.";
-	    sendToAll(quitMsg, name);
+	if (mapClients.containsKey(client.getAnonymousNumber())) {
+	    mapClients.get(client.getAnonymousNumber()).closeClient();
+	    mapClients.remove(client.getAnonymousNumber());
+	    String quitMsg = "User " + client.getName() + " has left.";
+	    sendToAll(quitMsg, client);
 	}
     }
 
-    public void sendToAll(final String message, final String name) {
+    public void sendToAll(final String message, final Client client) {
 
-	for (Client container : mapClients.values()) {
-	    if (container == null || container.getName() == name) {
+	for (Client cl : mapClients.values()) {
+	    if (cl == null || cl.getAnonymousNumber() == client.getAnonymousNumber()) {
 		continue;
 	    }
-	    container.sendMsg(message);
+	    cl.sendMsg(message);
 	}
     }
 
@@ -41,14 +41,6 @@ public class ChatRoom {
 	for (Client client : mapClients.values()) {
 	    client.closeClient();
 	}
-    }
-    
-    public String getNameOfRoom() {
-	return this.name;
-    }
-    
-    public synchronized boolean containsClient(String name) {
-	return mapClients.containsKey("name");
     }
     
     @Override
@@ -74,5 +66,19 @@ public class ChatRoom {
 	} else if (!name.equals(other.name))
 	    return false;
 	return true;
+    }
+
+    @Override
+    public String toString() {
+	return name;
+    }
+
+    public boolean containsClient(String name) {
+	for (Integer key : mapClients.keySet()) {
+	    if (mapClients.get(key).getName().equals(name)) {
+		return true;
+	    }
+	}
+	return false;
     }
 }

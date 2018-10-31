@@ -16,16 +16,17 @@ public class ClientThread extends Thread {
     @Override
     public void run() {
 
-	try (final BufferedReader bufferedReader = new BufferedReader(
-		new InputStreamReader(client.getSocket().getInputStream()));) {
-
-	    client.sendMsg("Chose name: ");
-	    this.selectName(bufferedReader);
+	try {
+	    final BufferedReader bufferedReader = new BufferedReader(
+		    new InputStreamReader(client.getSocket().getInputStream()));
 
 	    final String pickMessage = "Type '-quit' for exit.\nPick a room: "; // list of rooms to add
 
 	    client.sendMsg(pickMessage);
-	    this.pickRoom(bufferedReader);
+	    pickRoom(bufferedReader);
+
+	    client.sendMsg("Chose name: ");
+	    selectName(bufferedReader);
 
 	    client.listenFromConsole();
 
@@ -39,11 +40,10 @@ public class ClientThread extends Thread {
     }
 
     private void selectName(BufferedReader bufferedReader) throws IOException {
-	final String name = bufferedReader.readLine();
+	String name = bufferedReader.readLine();
 	if (name != null && !client.getRoom().containsClient(name)) {
 	    this.client.setName(name);
 	}
-
     }
 
     private void pickRoom(BufferedReader bufferedReader) throws IOException {
