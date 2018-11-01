@@ -3,16 +3,17 @@ package com.egtinteractive.chatserver;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ChatRoom {
+public class ChatRoom implements Room {
     private final String name;
-    private final Map<Integer, Client> mapClients;
+    private final Map<Integer, ChatClient> mapClients;
 
     public ChatRoom(String name) {
 	this.name = name;
 	this.mapClients = new ConcurrentHashMap<>();
     }
 
-    public void addClient(final Client client) {
+    @Override
+    public void addClient(final ChatClient client) {
 	mapClients.putIfAbsent(client.getAnonymousNumber(), client);
     }
 
@@ -26,6 +27,7 @@ public class ChatRoom {
 	}
     }
 
+    @Override
     public void sendToAll(final String message, final Client client) {
 
 	for (Client cl : mapClients.values()) {
@@ -36,13 +38,24 @@ public class ChatRoom {
 	}
     }
 
+    @Override
+    public boolean containsClient(String name) {
+	for (Integer key : mapClients.keySet()) {
+	    if (mapClients.get(key).getName().equals(name)) {
+		return true;
+	    }
+	}
+	return false;
+    }
+
+    @Override
     public void closeRoom() {
 
 	for (Client client : mapClients.values()) {
 	    client.closeClient();
 	}
     }
-    
+
     @Override
     public int hashCode() {
 	final int prime = 31;
@@ -73,12 +86,4 @@ public class ChatRoom {
 	return name;
     }
 
-    public boolean containsClient(String name) {
-	for (Integer key : mapClients.keySet()) {
-	    if (mapClients.get(key).getName().equals(name)) {
-		return true;
-	    }
-	}
-	return false;
-    }
 }
