@@ -11,9 +11,9 @@ public class ChatClient implements Client {
     private final int anonymousNumber;
     private final Socket socket;
     private final RoomManager roomManager;
+    private final BufferedReader bufferedReader;
     private String name;
     private ChatRoom room;
-    private final BufferedReader bufferedReader;
 
     public ChatClient(final int number, final Socket newSocket, final RoomManager roomManager) throws IOException {
 	this.anonymousNumber = number;
@@ -24,9 +24,9 @@ public class ChatClient implements Client {
     }
 
     @Override
-    public void sendMsg(String message) {
+    public void sendMsg(final String message) {
 	try {
-	    PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+	    PrintWriter printWriter = new PrintWriter(this.socket.getOutputStream(), true);
 	    printWriter.println(message);
 	} catch (IOException e) {
 	    System.out.println("User disconnected!");
@@ -36,25 +36,25 @@ public class ChatClient implements Client {
 
     @Override
     public void listenFromConsole() throws IOException {
-	if (!socket.isClosed()) {
+	if (!this.socket.isClosed()) {
 	    String message;
-	    while ((message = bufferedReader.readLine()) != null) {
+	    while ((message = this.bufferedReader.readLine()) != null) {
 		if (message.contains(QUIT_COMMAND)) {
-		    room.removeClient(this);
+		    this.room.removeClient(this);
 		    break;
 		}
 		if (message.isEmpty()) {
 		    continue;
 		}
-		final String messageToSend = this.getName()+ " " + this.getAnonymousNumber() + " wrote: " + message;
-		room.sendToAll(messageToSend, this);
+		final String messageToSend = this.getName() + " " + this.getAnonymousNumber() + " wrote: " + message;
+		this.room.sendToAll(messageToSend, this);
 	    }
 	}
     }
 
     @Override
     public void selectName() throws IOException {
-	String name = bufferedReader.readLine();
+	final String name = this.bufferedReader.readLine();
 	if (name != null) {
 	    this.name = name;
 	}
@@ -63,8 +63,8 @@ public class ChatClient implements Client {
     @Override
     public void pickRoom() throws IOException {
 	String message;
-	while ((message = bufferedReader.readLine()) != null) {
-	    if (message != null && roomManager.putClientInRoom(message, this)) {
+	while ((message = this.bufferedReader.readLine()) != null) {
+	    if (message != null && this.roomManager.putClientInRoom(message, this)) {
 		break;
 	    }
 	}
@@ -80,14 +80,13 @@ public class ChatClient implements Client {
     @Override
     public void closeClient() {
 	try {
-	    socket.shutdownInput();
-	    socket.shutdownOutput();
-	    socket.close();
+	    this.socket.shutdownInput();
+	    this.socket.shutdownOutput();
+	    this.socket.close();
 	} catch (IOException e) {
 	    System.out.println("Shutting down fail!");
 	}
     }
-
 
     @Override
     public int getAnonymousNumber() {
@@ -104,12 +103,11 @@ public class ChatClient implements Client {
 	return this.name;
     }
 
-
     @Override
     public int hashCode() {
 	final int prime = 31;
 	int result = 1;
-	result = prime * result + anonymousNumber;
+	result = prime * result + this.anonymousNumber;
 	return result;
     }
 
@@ -122,7 +120,7 @@ public class ChatClient implements Client {
 	if (getClass() != obj.getClass())
 	    return false;
 	ChatClient other = (ChatClient) obj;
-	if (anonymousNumber != other.anonymousNumber)
+	if (this.anonymousNumber != other.anonymousNumber)
 	    return false;
 	return true;
     }

@@ -36,7 +36,7 @@ public class RoomManager {
     }
 
     public void closeRooms() {
-	for (Room room : chatRooms.values()) {
+	for (Room room : this.chatRooms.values()) {
 	    room.closeRoom();
 	}
     }

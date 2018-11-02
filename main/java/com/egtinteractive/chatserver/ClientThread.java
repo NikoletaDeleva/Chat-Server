@@ -5,7 +5,7 @@ import java.io.IOException;
 public class ClientThread extends Thread {
     private final Client client;
 
-    public ClientThread(Client client) {
+    public ClientThread(final Client client) {
 	this.client = client;
     }
 
@@ -15,16 +15,16 @@ public class ClientThread extends Thread {
 	try {
 	    final String pickMessage = "Type '-quit' for exit.\nPick a room: "; // list of rooms to add
 	    
-	    client.sendMsg("Chose name: ");
-	    client.selectName();
+	    this.client.sendMsg("Chose name: ");
+	    this.client.selectName();
 	    
-	    client.sendMsg(pickMessage);
-	    client.pickRoom();
+	    this.client.sendMsg(pickMessage);
+	    this.client.pickRoom();
 
-	    client.listenFromConsole();
+	    this.client.listenFromConsole();
 
-	    System.out.println("User " + client.getName() + " " + client.getAnonymousNumber() + " disconnected from server.");
-	    client.disconnectFromRoom();
+	    System.out.println("User " + this.client.getName() + " " + this.client.getAnonymousNumber() + " disconnected from server.");
+	    this.client.disconnectFromRoom();
 
 	} catch (IOException e) {
 	    System.out.println("Client thread terminated.");
