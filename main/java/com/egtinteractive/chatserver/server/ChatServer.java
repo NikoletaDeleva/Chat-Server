@@ -1,34 +1,35 @@
 package com.egtinteractive.chatserver.server;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.egtinteractive.chatserver.client.ChatClient;
-import com.egtinteractive.chatserver.client.Client;
-import com.egtinteractive.chatserver.client.ClientThread;
 import com.egtinteractive.chatserver.room.RoomManager;
 
 public class ChatServer implements Server {
-    private final static String HOST = "localhost";
     private final static int PORT = 1111;
+
     private final AtomicInteger clientNumber;
-    private ServerSocket serverSocket;
+    private final ServerSocket serverSocket;
+
     private RoomManager roomManager;
 
-    public ChatServer() {
+    private ChatServer(final ServerSocket serverSocket) {
 	this.clientNumber = new AtomicInteger(1);
 	this.roomManager = new RoomManager();
+	this.serverSocket = serverSocket;
+    }
+
+    public static ChatServer newChatServer() throws IOException {
+	final ServerSocket serverSocket = new ServerSocket(PORT);
+	return new ChatServer(serverSocket);
     }
 
     @Override
     public void start() {
 	try {
-	    final InetAddress address = InetAddress.getByName(HOST);
-
-	    this.serverSocket = new ServerSocket(PORT, 100, address);
 
 	    System.out.println("Listening on " + this.serverSocket);
 
@@ -37,9 +38,7 @@ public class ChatServer implements Server {
 		final Socket newSocket = this.serverSocket.accept();
 		System.out.println("Connection established.");
 
-		final Client newClient = new ChatClient(this.clientNumber.get(), newSocket, this.roomManager);
-
-		new ClientThread(newClient).start();
+		ChatClient.newClient(this.clientNumber.get(), newSocket, this.roomManager).startClient();
 
 		this.clientNumber.incrementAndGet();
 	    }

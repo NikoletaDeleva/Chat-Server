@@ -24,4 +24,6 @@ public interface Client {
 
     public String getName();
 
+    public void startClient();
+
 }

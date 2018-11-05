@@ -2,9 +2,12 @@ package com.egtinteractive.chatserver.client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Set;
 
 import com.egtinteractive.chatserver.room.ChatRoom;
 import com.egtinteractive.chatserver.room.Room;
@@ -13,18 +16,70 @@ import com.egtinteractive.chatserver.room.RoomManager;
 public class ChatClient implements Client {
     private static final String QUIT_COMMAND = "-quit";
     private final int anonymousNumber;
-    private final Socket socket;
     private final RoomManager roomManager;
-    private final BufferedReader bufferedReader;
+    private final Socket socket;
+
+    private final ClientReader clientReader;
+    private final ClientWriter clientWriter;
+
     private String name;
     private ChatRoom room;
 
-    public ChatClient(final int number, final Socket newSocket, final RoomManager roomManager) throws IOException {
+    private ChatClient(final int number, final Socket socket, final RoomManager roomManager, ClientReader reader,
+	    ClientWriter writer) throws IOException {
 	this.anonymousNumber = number;
-	this.socket = newSocket;
+	this.socket = socket;
 	this.name = "Anonymus";
 	this.roomManager = roomManager;
-	this.bufferedReader = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+
+	this.clientWriter = writer;
+	this.clientReader = reader;
+
+	this.setRoomAndName();
+    }
+
+    public static Client newClient(final int number, final Socket socket, final RoomManager roomManager) {
+	try {
+	    final OutputStream outputStream = socket.getOutputStream();
+	    final InputStream inputStream = socket.getInputStream();
+
+	    final ClientReader reader = new ClientReader(inputStream);
+	    final ClientWriter writer = new ClientWriter(outputStream);
+
+	    return new ChatClient(number, socket, roomManager, reader, writer);
+
+	} catch (IOException e) {
+	    e.printStackTrace();
+	    try {
+		socket.close();
+	    } catch (IOException e1) {
+		e1.printStackTrace();
+	    }
+	    return null;
+	}
+    }
+
+    private void setRoomAndName() {
+	final String pickMessage = "Type '-quit' for exit.\nPick a room: "; // list of rooms to add
+
+	try {
+	    this.sendMsg("Chose name: ");
+	    this.selectName();
+
+	    this.sendMsg(pickMessage);
+	    this.pickRoom();
+
+	    this.listenFromConsole();
+	} catch (IOException e) {
+	    e.printStackTrace();
+	}
+	System.out.println("User " + this.getName() + " " + this.getAnonymousNumber() + " disconnected from server.");
+    }
+
+    @Override
+    public void startClient() {
+	clientReader.start();
+	clientWriter.start();
     }
 
     @Override
