@@ -1,4 +1,4 @@
-package com.egtinteractive.chatserver;
+package com.egtinteractive.chatserver.client;
 
 import java.io.IOException;
 

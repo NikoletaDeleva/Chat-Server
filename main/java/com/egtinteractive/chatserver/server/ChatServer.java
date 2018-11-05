@@ -1,10 +1,15 @@
-package com.egtinteractive.chatserver;
+package com.egtinteractive.chatserver.server;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import com.egtinteractive.chatserver.client.ChatClient;
+import com.egtinteractive.chatserver.client.Client;
+import com.egtinteractive.chatserver.client.ClientThread;
+import com.egtinteractive.chatserver.room.RoomManager;
 
 public class ChatServer implements Server {
     private final static String HOST = "localhost";

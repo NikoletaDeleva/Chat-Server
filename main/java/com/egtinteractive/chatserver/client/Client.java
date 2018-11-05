@@ -1,6 +1,8 @@
-package com.egtinteractive.chatserver;
+package com.egtinteractive.chatserver.client;
 
 import java.io.IOException;
+
+import com.egtinteractive.chatserver.room.Room;
 
 public interface Client {
 

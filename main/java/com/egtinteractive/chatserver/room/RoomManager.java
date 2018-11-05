@@ -1,7 +1,9 @@
-package com.egtinteractive.chatserver;
+package com.egtinteractive.chatserver.room;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import com.egtinteractive.chatserver.client.ChatClient;
 
 public class RoomManager {
     private final static String QUIT_COMMAND = "-quit";
@@ -12,7 +14,7 @@ public class RoomManager {
 	this.chatRooms.put("Defalut", new ChatRoom("Default"));
     }
 
-    boolean putClientInRoom(final String selectedRoom, final ChatClient client) {
+    public boolean putClientInRoom(final String selectedRoom, final ChatClient client) {
 
 	if (selectedRoom.contains(QUIT_COMMAND)) {
 	    client.closeClient();

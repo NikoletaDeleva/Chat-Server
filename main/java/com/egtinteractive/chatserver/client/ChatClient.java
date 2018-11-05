@@ -1,10 +1,14 @@
-package com.egtinteractive.chatserver;
+package com.egtinteractive.chatserver.client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+
+import com.egtinteractive.chatserver.room.ChatRoom;
+import com.egtinteractive.chatserver.room.Room;
+import com.egtinteractive.chatserver.room.RoomManager;
 
 public class ChatClient implements Client {
     private static final String QUIT_COMMAND = "-quit";

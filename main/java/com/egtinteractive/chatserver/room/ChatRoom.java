@@ -1,7 +1,10 @@
-package com.egtinteractive.chatserver;
+package com.egtinteractive.chatserver.room;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import com.egtinteractive.chatserver.client.ChatClient;
+import com.egtinteractive.chatserver.client.Client;
 
 public class ChatRoom implements Room {
     private final String name;
