@@ -113,7 +113,7 @@ public class ChatClient implements Client {
 
     @Override
     public void selectName() throws IOException {
-	final String name = this.bufferedReader.readLine();
+	final String name = this.clientReader.readLine();
 	if (name != null) {
 	    this.name = name;
 	}

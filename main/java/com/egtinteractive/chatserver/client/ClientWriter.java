@@ -28,6 +28,12 @@ public class ClientWriter extends Thread {
 	}
     }
     
+    
+    
+    
+    
+    
+    
 
     public void addMessage(final byte[] message) {
 	messageQueue.offer(message);

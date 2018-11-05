@@ -31,9 +31,6 @@ public class ClientReader extends Thread {
 		    byte[] message = Arrays.copyOf(messageBuffer, position);
 		    chatRoom.sendToAll(message, this);
 		    position = 0;
-		    if (inputTimeout > 0) {
-			Thread.sleep(inputTimeout);
-		    }
 
 		    if (readByte == '\r') {
 			readByte = inputStream.read();
