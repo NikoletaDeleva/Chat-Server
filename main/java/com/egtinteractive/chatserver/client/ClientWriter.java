@@ -6,37 +6,37 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ClientWriter extends Thread {
-	private final BlockingQueue<byte[]> messageQueue;
-	private final OutputStream outputStream;
-	
-	public ClientWriter(OutputStream outputStream) {
-		this.messageQueue = new LinkedBlockingQueue<>(10000);
-		this.outputStream = outputStream;
-	}
+    private final BlockingQueue<byte[]> messageQueue;
+    private final OutputStream outputStream;
 
-	@Override
-	public void run() {
-		try {
-			byte[] message;
-			while (!isInterrupted()) {
+    public ClientWriter(OutputStream outputStream) {
+	this.messageQueue = new LinkedBlockingQueue<>(10000);
+	this.outputStream = outputStream;
+    }
 
-				message = messageQueue.take();
-				outputStream.write(message);
-			}
-		} catch (InterruptedException | IOException e) {
-			e.printStackTrace();
-		}
-	}
+    @Override
+    public void run() {
+	try {
+	    byte[] message;
+	    while (!isInterrupted()) {
 
-	public void addMessage(final byte[] message) {
-		messageQueue.offer(message);
+		message = messageQueue.take();
+		outputStream.write(message);
+	    }
+	} catch (InterruptedException | IOException e) {
+	    e.printStackTrace();
 	}
+    }
 
-	public boolean isWorking() {
-		return isAlive();
-	}
+    public void addMessage(final byte[] message) {
+	messageQueue.offer(message);
+    }
 
-	public void close() {
-		interrupt();
-	}
+    public boolean isWorking() {
+	return isAlive();
+    }
+
+    public void close() {
+	interrupt();
+    }
 }

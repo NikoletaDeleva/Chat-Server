@@ -1,29 +1,27 @@
 package com.egtinteractive.chatserver.client;
 
-import java.io.IOException;
+import java.io.OutputStream;
 
 import com.egtinteractive.chatserver.room.Room;
 
 public interface Client {
 
-	public void sendMsg(String message);
+    public void sendMsg(String message, OutputStream outputStream);
 
-	public void listenFromConsole() throws IOException;
+    public void disconnectFromRoom();
 
-	public void selectName() throws IOException;
+    public void closeClient();
 
-	public void pickRoom() throws IOException;
+    public int getAnonymousNumber();
 
-	public void disconnectFromRoom();
+    public void setRoom(Room chosenRoom);
 
-	public void closeClient();
+    public void startClient();
 
-	public int getAnonymousNumber();
+    public ClientReader getReader();
 
-	public void setRoom(Room chosenRoom);
+    public ClientWriter getWriter();
 
-	public String getName();
-
-	public void startClient();
+    public void close();
 
 }

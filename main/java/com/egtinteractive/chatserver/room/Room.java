@@ -9,10 +9,8 @@ public interface Room {
 
 	public void removeClient(final Client client);
 
-	public void sendToAll(String message, Client client);
-
 	public void closeRoom();
 
-	public boolean containsClient(String name);
+	public void sendToAll(byte[] message, Client client);
 
 }
