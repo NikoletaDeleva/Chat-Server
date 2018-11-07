@@ -4,22 +4,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
-import com.egtinteractive.chatserver.room.Room;
-
 public class ClientReader extends Thread {
     private final InputStream inputStream;
-    private final Room chatRoom;
     private final Client client;
 
-    public ClientReader(final InputStream inputStream, Client client, Room room) {
+    public ClientReader(final InputStream inputStream, Client client) {
 	this.inputStream = inputStream;
-	this.chatRoom = room;
 	this.client = client;
     }
 
     @Override
     public void run() {
 	try {
+	    this.client.setRoomAndName(client.getWriter(), client.getReader());
+
 	    byte[] messageBuffer = new byte[1024];
 	    int position = 0;
 	    int readByte;
@@ -32,8 +30,8 @@ public class ClientReader extends Thread {
 		    messageBuffer[position++] = (byte) '\r';
 		    messageBuffer[position++] = (byte) '\n';
 		    byte[] message = Arrays.copyOf(messageBuffer, position);
-		    chatRoom.sendToAll((this.client.toString() + ": ").getBytes(), this.client);
-		    chatRoom.sendToAll(message, this.client);
+		    this.client.sendToOthers((this.client.toString() + ": ").getBytes());
+		    this.client.sendToOthers(message);
 		    position = 0;
 
 		    if (readByte == '\r') {

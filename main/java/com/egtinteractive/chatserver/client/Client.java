@@ -1,22 +1,16 @@
 package com.egtinteractive.chatserver.client;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-
 import com.egtinteractive.chatserver.room.Room;
 
 public interface Client {
 
-    public void sendMsg(final String message, final PrintWriter printWriter);
+    public void sendMsg(String message, ClientWriter clientWriter);
 
     public void disconnectFromRoom();
 
     public void closeClient();
 
     public int getAnonymousNumber();
-
-    public void setRoomAndName(BufferedReader bufferedReader, PrintWriter printWriter) throws IOException;
 
     public void setRoom(Room chosenRoom);
 
@@ -27,5 +21,9 @@ public interface Client {
     public ClientWriter getWriter();
 
     public void close();
+
+    public void setRoomAndName(ClientWriter writer, ClientReader reader);
+
+    public void sendToOthers(byte[] bytes);
 
 }

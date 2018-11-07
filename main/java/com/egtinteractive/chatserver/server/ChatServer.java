@@ -1,13 +1,8 @@
 package com.egtinteractive.chatserver.server;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.egtinteractive.chatserver.client.ChatClient;
@@ -19,8 +14,6 @@ public class ChatServer implements Server {
 
     private final AtomicInteger clientNumber;
     private final ServerSocket serverSocket;
-
-    private ExecutorService executorService;
 
     private RoomManager roomManager;
 
@@ -47,22 +40,6 @@ public class ChatServer implements Server {
 		System.out.println("Connection established.");
 
 		final Client chatClient = new ChatClient(clientNumber.get(), newSocket, this.roomManager);
-
-		this.executorService = Executors.newSingleThreadExecutor();
-
-		this.executorService.execute(new Runnable() {
-		    public void run() {
-			try {
-			    final BufferedReader bufferedReader = new BufferedReader(
-				    new InputStreamReader(newSocket.getInputStream()));
-			    final PrintWriter printWriter = new PrintWriter(newSocket.getOutputStream(), true);
-
-			    chatClient.setRoomAndName(bufferedReader, printWriter);
-			} catch (IOException e) {
-			    e.printStackTrace();
-			}
-		    }
-		});
 
 		chatClient.startClient();
 		this.clientNumber.incrementAndGet();
