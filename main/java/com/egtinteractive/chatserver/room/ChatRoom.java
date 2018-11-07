@@ -6,7 +6,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.egtinteractive.chatserver.client.ChatClient;
 import com.egtinteractive.chatserver.client.Client;
 
-
 public class ChatRoom implements Room {
     private final String name;
     private final Map<Integer, ChatClient> mapClients;

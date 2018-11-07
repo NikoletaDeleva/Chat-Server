@@ -32,10 +32,6 @@ public class ClientWriter extends Thread {
 	messageQueue.offer(message);
     }
 
-    public boolean isWorking() {
-	return isAlive();
-    }
-
     public void close() {
 	interrupt();
     }

@@ -1,6 +1,6 @@
 package com.egtinteractive.chatserver.room;
 
-import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -15,8 +15,7 @@ public class RoomManager {
 	this.chatRooms.put("Defalut", new ChatRoom("Default"));
     }
 
-    public boolean putClientInRoom(final String selectedRoom, final ChatClient client,
-	    final OutputStream outputStream) {
+    public boolean putClientInRoom(final String selectedRoom, final ChatClient client, final PrintWriter printWriter) {
 
 	if (selectedRoom.contains(QUIT_COMMAND)) {
 	    client.closeClient();
@@ -26,16 +25,17 @@ public class RoomManager {
 	Room chosenRoom = this.chatRooms.get(selectedRoom);
 	if (chosenRoom == null) {
 	    this.chatRooms.put(selectedRoom, new ChatRoom(selectedRoom));
-	    client.sendMsg("You made a new room!" + '\n', outputStream);
+	    client.sendMsg("You made a new room!" + '\n', printWriter);
 	    chosenRoom = this.chatRooms.get(selectedRoom);
 	}
 	chosenRoom.addClient(client);
 
 	client.setRoom(chosenRoom);
-	client.sendMsg("You joined: " + chosenRoom.toString() + '\n', outputStream);
+	client.sendMsg("You joined: " + chosenRoom.toString() + '\n', printWriter);
 
 	chosenRoom.sendToAll(
-		("User " + client.toString() + client.getAnonymousNumber() + " joined room." + '\n').getBytes(), client);
+		("User " + client.toString() + client.getAnonymousNumber() + " joined room." + '\n').getBytes(),
+		client);
 
 	return true;
     }
@@ -44,5 +44,9 @@ public class RoomManager {
 	for (Room room : this.chatRooms.values()) {
 	    room.closeRoom();
 	}
+    }
+
+    public Room getDefaultRoom() {
+	return chatRooms.get("Default");
     }
 }
