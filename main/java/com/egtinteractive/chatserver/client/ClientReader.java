@@ -2,7 +2,6 @@ package com.egtinteractive.chatserver.client;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 public class ClientReader extends Thread {
@@ -22,7 +21,7 @@ public class ClientReader extends Thread {
 
 	    this.client.sendMsg("Pick a room: ");
 	    this.client.setRoom(this.selectRoom());
-
+	    this.client.sendToOthers((this.client.getName()).getBytes());
 	    byte[] messageBuffer = new byte[1024];
 	    int position = 0;
 	    int readByte;
@@ -31,23 +30,13 @@ public class ClientReader extends Thread {
 		    messageBuffer = Arrays.copyOf(messageBuffer, 2 * messageBuffer.length);
 		}
 
-		if (readByte == '\r' || readByte == '\n') {
-		    messageBuffer[position++] = (byte) '\r';
+		if (readByte == '\n') {
 		    messageBuffer[position++] = (byte) '\n';
 		    byte[] message = Arrays.copyOf(messageBuffer, position);
 		    this.client.sendToOthers((this.client.getName() + ": ").getBytes());
 		    this.client.sendToOthers(message);
 		    position = 0;
 
-		    if (readByte == '\r') {
-			readByte = inputStream.read();
-			if (readByte == -1) {
-			    break;
-			}
-			if (readByte != '\n' && readByte != '\0') {
-			    messageBuffer[position++] = (byte) readByte;
-			}
-		    }
 		} else {
 		    messageBuffer[position++] = (byte) readByte;
 		}
@@ -69,8 +58,7 @@ public class ClientReader extends Thread {
 	    }
 	    bytes[pos++] = (byte) readByte;
 	}
-	final String name = new String(bytes, StandardCharsets.UTF_16);
-
+	final String name = new String(bytes, "UTF-8");
 	return name;
     }
 
@@ -84,7 +72,7 @@ public class ClientReader extends Thread {
 	    }
 	    bytes[pos++] = (byte) readByte;
 	}
-	final String room = new String(bytes, StandardCharsets.UTF_16);
+	final String room = new String(bytes, "UTF-8");
 	return room;
     }
 }
