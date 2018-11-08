@@ -4,7 +4,7 @@ import com.egtinteractive.chatserver.room.Room;
 
 public interface Client {
 
-    public void sendMsg(String message, ClientWriter clientWriter);
+    public void sendMsg(String message);
 
     public void disconnectFromRoom();
 
@@ -12,7 +12,7 @@ public interface Client {
 
     public int getAnonymousNumber();
 
-    public void setRoom(Room chosenRoom);
+    public void setRoom(String room);
 
     public void startClient();
 
@@ -22,8 +22,12 @@ public interface Client {
 
     public void close();
 
-    public void setRoomAndName(ClientWriter writer, ClientReader reader);
-
     public void sendToOthers(byte[] bytes);
+
+    public void setName(String name);
+
+    public String getName();
+
+    public Room getRoom();
 
 }

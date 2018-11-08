@@ -1,13 +1,10 @@
 package com.egtinteractive.chatserver.client;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import com.egtinteractive.chatserver.room.ChatRoom;
 import com.egtinteractive.chatserver.room.Room;
 import com.egtinteractive.chatserver.room.RoomManager;
 
@@ -25,7 +22,6 @@ public class ChatClient implements Client {
     public ChatClient(final int number, final Socket socket, final RoomManager roomManager) {
 	this.anonymousNumber = number;
 	this.socket = socket;
-	this.name = "Anonymus";
 	this.roomManager = roomManager;
 	this.room = roomManager.getDefaultRoom();
 
@@ -54,45 +50,16 @@ public class ChatClient implements Client {
 
     }
 
-    public void setRoomAndName(final ClientWriter clientWriter, final ClientReader clientReader) throws IOException {
-	final String pickMessage = "Type '-quit' for exit.\nPick a room: "; // list of rooms to add
-
-	this.sendMsg("Chose name: ", clientWriter);
-	this.selectName(clientReader);
-
-	this.sendMsg(pickMessage, clientWriter);
-	this.pickRoom(clientReader);
-
-    }
-
-    private void selectName(final ClientReader clientReader) throws IOException {
-
-	final String name = bufferedReader.readLine();
-	if (name != null) {
-	    this.name = name;
-	}
-    }
-
-    private void pickRoom(final ClientReader clientReader) throws IOException {
-	String message;
-
-	while ((message = bufferedReader.readLine()) != null) {
-	    if (message != null && this.roomManager.putClientInRoom(message, this)) {
-		break;
-	    }
-	}
-    }
-    
-    public void sendToOthers(byte[] message) {
-	this.room.sendToAll(message, this);
-    }
-    
     @Override
     public void startClient() {
 	if (!this.socket.isClosed()) {
-	    this.clientReader.start();
 	    this.clientWriter.start();
+	    this.clientReader.start();
 	}
+    }
+
+    public void sendToOthers(byte[] message) {
+	this.room.sendToAll(message, this);
     }
 
     @Override
@@ -107,7 +74,7 @@ public class ChatClient implements Client {
     }
 
     @Override
-    public void sendMsg(final String message, ClientWriter clientWriter) {
+    public void sendMsg(final String message) {
 	clientWriter.addMessage(message.getBytes());
     }
 
@@ -135,8 +102,12 @@ public class ChatClient implements Client {
     }
 
     @Override
-    public void setRoom(Room chosenRoom) {
-	this.room = (ChatRoom) chosenRoom;
+    public void setRoom(String room) {
+	this.roomManager.putClientInRoom(room, this);
+    }
+
+    public Room getRoom() {
+	return this.room;
     }
 
     @Override
@@ -147,6 +118,20 @@ public class ChatClient implements Client {
     @Override
     public ClientWriter getWriter() {
 	return this.clientWriter;
+    }
+
+    public void setRoom(Room chosenRoom) {
+	this.room = chosenRoom;
+    }
+
+    @Override
+    public void setName(String name) {
+	this.name = name;
+    }
+
+    @Override
+    public String getName() {
+	return this.name;
     }
 
     @Override

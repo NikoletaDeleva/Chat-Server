@@ -29,7 +29,7 @@ public class ChatRoom implements Room {
 	mapClients.remove(client.getAnonymousNumber());
 	client.close();
 	if (isRunning) {
-	    sendToAll(("User " + client.toString() + "has left the room.").getBytes(), client);
+	    sendToAll(("User " + client.getName() + "has left the room.").getBytes(), client);
 	}
     }
 

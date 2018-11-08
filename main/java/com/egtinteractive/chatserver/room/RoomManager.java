@@ -6,7 +6,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.egtinteractive.chatserver.client.ChatClient;
 
 public class RoomManager {
-    private final static String QUIT_COMMAND = "-quit";
     private Map<String, Room> chatRooms;
 
     public RoomManager() {
@@ -14,28 +13,21 @@ public class RoomManager {
 	this.chatRooms.put("Defalut", new ChatRoom("Default"));
     }
 
-    public boolean putClientInRoom(final String selectedRoom, final ChatClient client) {
-
-	if (selectedRoom.contains(QUIT_COMMAND)) {
-	    client.closeClient();
-	    return true;
-	}
+    public void putClientInRoom(final String selectedRoom, final ChatClient client) {
 
 	Room chosenRoom = this.chatRooms.get(selectedRoom);
 	if (chosenRoom == null) {
 	    this.chatRooms.put(selectedRoom, new ChatRoom(selectedRoom));
-	    client.sendMsg("You made a new room!" + '\n', client.getWriter());
+	    client.sendMsg("You made a new room!" + '\n');
 	    chosenRoom = this.chatRooms.get(selectedRoom);
 	}
 	chosenRoom.addClient(client);
 
 	client.setRoom(chosenRoom);
-	client.sendMsg("You joined: " + chosenRoom.toString() + '\n', client.getWriter());
+	client.sendMsg("You joined: " + client.getRoom().toString() + '\n');
 
 	chosenRoom.sendToAll(
 		("User " + client.toString() + client.getAnonymousNumber() + " joined room." + '\n').getBytes(), client);
-
-	return true;
     }
 
     public void closeRooms() {
