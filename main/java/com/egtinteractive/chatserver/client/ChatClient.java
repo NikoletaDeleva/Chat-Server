@@ -16,7 +16,7 @@ public class ChatClient implements Client {
     private ClientReader clientReader;
     private ClientWriter clientWriter;
 
-    private String name;
+    private volatile String name;
     private Room room;
 
     public ChatClient(final int number, final Socket socket, final RoomManager roomManager) {

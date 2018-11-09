@@ -8,7 +8,7 @@ public class ClientReader extends Thread {
     private final InputStream inputStream;
     private final Client client;
 
-    public ClientReader(final InputStream inputStream, Client client) {
+    public ClientReader(final InputStream inputStream, final Client client) {
 	this.inputStream = inputStream;
 	this.client = client;
     }
@@ -21,7 +21,7 @@ public class ClientReader extends Thread {
 
 	    this.client.sendMsg("Pick a room: ");
 	    this.client.setRoom(this.selectRoom());
-	    this.client.sendToOthers((this.client.getName()).getBytes());
+
 	    byte[] messageBuffer = new byte[1024];
 	    int position = 0;
 	    int readByte;
@@ -32,7 +32,9 @@ public class ClientReader extends Thread {
 
 		if (readByte == '\n') {
 		    messageBuffer[position++] = (byte) '\n';
-		    byte[] message = Arrays.copyOf(messageBuffer, position);
+
+		    final byte[] message = Arrays.copyOf(messageBuffer, position);
+		    
 		    this.client.sendToOthers((this.client.getName() + ": ").getBytes());
 		    this.client.sendToOthers(message);
 		    position = 0;
@@ -59,7 +61,7 @@ public class ClientReader extends Thread {
 	    bytes[pos++] = (byte) readByte;
 	}
 	final String name = new String(bytes, "UTF-8");
-	return name;
+	return name.trim();
     }
 
     private String selectRoom() throws IOException {
@@ -73,6 +75,6 @@ public class ClientReader extends Thread {
 	    bytes[pos++] = (byte) readByte;
 	}
 	final String room = new String(bytes, "UTF-8");
-	return room;
+	return room.trim();
     }
 }
