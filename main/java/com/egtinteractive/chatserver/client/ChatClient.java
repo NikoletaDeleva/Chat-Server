@@ -58,7 +58,8 @@ public class ChatClient implements Client {
 	}
     }
 
-    public void sendToOthers(byte[] message) {
+    @Override
+    public void sendToOthers(final byte[] message) {
 	this.room.sendToAll(message, this);
     }
 
@@ -75,7 +76,7 @@ public class ChatClient implements Client {
 
     @Override
     public void sendMsg(final String message) {
-	clientWriter.addMessage(message.getBytes());
+	this.clientWriter.addMessage(message.getBytes());
     }
 
     @Override
@@ -102,10 +103,11 @@ public class ChatClient implements Client {
     }
 
     @Override
-    public void setRoom(String room) {
+    public void setRoom(final String room) {
 	this.roomManager.putClientInRoom(room, this);
     }
 
+    @Override
     public Room getRoom() {
 	return this.room;
     }
@@ -120,12 +122,13 @@ public class ChatClient implements Client {
 	return this.clientWriter;
     }
 
-    public void setRoom(Room chosenRoom) {
+    @Override
+    public void setRoom(final Room chosenRoom) {
 	this.room = chosenRoom;
     }
 
     @Override
-    public void setName(String name) {
+    public void setName(final String name) {
 	this.name = name;
     }
 

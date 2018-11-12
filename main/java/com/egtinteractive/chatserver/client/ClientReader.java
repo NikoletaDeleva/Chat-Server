@@ -2,6 +2,7 @@ package com.egtinteractive.chatserver.client;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 public class ClientReader extends Thread {
@@ -17,24 +18,21 @@ public class ClientReader extends Thread {
     public void run() {
 	try {
 	    this.client.sendMsg("Chose name: ");
-	    this.client.setName(this.selectName());
+	    this.client.setName(this.settingByReading());
 
 	    this.client.sendMsg("Pick a room: ");
-	    this.client.setRoom(this.selectRoom());
+	    this.client.setRoom(this.settingByReading());
 
 	    byte[] messageBuffer = new byte[1024];
 	    int position = 0;
 	    int readByte;
-	    while ((readByte = inputStream.read()) != -1) {
-		if (position >= messageBuffer.length - 2) {
-		    messageBuffer = Arrays.copyOf(messageBuffer, 2 * messageBuffer.length);
-		}
+	    while ((readByte = this.inputStream.read()) != -1) {
+		if (readByte == '\n' || position >= messageBuffer.length - 2) {
 
-		if (readByte == '\n') {
 		    messageBuffer[position++] = (byte) '\n';
 
 		    final byte[] message = Arrays.copyOf(messageBuffer, position);
-		    
+
 		    this.client.sendToOthers((this.client.getName() + ": ").getBytes());
 		    this.client.sendToOthers(message);
 		    position = 0;
@@ -46,35 +44,20 @@ public class ClientReader extends Thread {
 
 	} catch (IOException e) {
 	    e.printStackTrace();
-
 	}
     }
 
-    private String selectName() throws IOException {
+    private String settingByReading() throws IOException, UnsupportedEncodingException {
 	int readByte;
 	byte[] bytes = new byte[10];
 	int pos = 0;
-	while ((readByte = inputStream.read()) != -1) {
-	    if (readByte == '\n') {
+	while ((readByte = this.inputStream.read()) != -1) {
+	    if (readByte == '\n' || pos >= bytes.length - 1) {
 		break;
 	    }
 	    bytes[pos++] = (byte) readByte;
 	}
 	final String name = new String(bytes, "UTF-8");
 	return name.trim();
-    }
-
-    private String selectRoom() throws IOException {
-	int readByte;
-	byte[] bytes = new byte[10];
-	int pos = 0;
-	while ((readByte = inputStream.read()) != -1) {
-	    if (readByte == '\n') {
-		break;
-	    }
-	    bytes[pos++] = (byte) readByte;
-	}
-	final String room = new String(bytes, "UTF-8");
-	return room.trim();
     }
 }

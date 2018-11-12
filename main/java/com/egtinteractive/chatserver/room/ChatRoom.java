@@ -18,18 +18,18 @@ public class ChatRoom implements Room {
     }
 
     @Override
-    public void addClient(final ChatClient client) {
+    public void addClient(final Client client) {
 	if (client != null) {
-	    this.mapClients.putIfAbsent(client.getAnonymousNumber(), client);
+	    this.mapClients.putIfAbsent(client.getAnonymousNumber(), (ChatClient) client);
 	}
     }
 
     @Override
     public void removeClient(final Client client) {
-	mapClients.remove(client.getAnonymousNumber());
+	this.mapClients.remove(client.getAnonymousNumber());
 	client.close();
-	if (isRunning) {
-	    sendToAll(("User " + client.getName() + "has left the room.").getBytes(), client);
+	if (this.isRunning) {
+	    this.sendToAll(("User " + client.getName() + "has left the room.").getBytes(), client);
 	}
     }
 
@@ -45,7 +45,7 @@ public class ChatRoom implements Room {
 
     @Override
     public void closeRoom() {
-	isRunning = false;
+	this.isRunning = false;
 	for (Client client : this.mapClients.values()) {
 	    client.closeClient();
 	}

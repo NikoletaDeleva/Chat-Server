@@ -20,8 +20,8 @@ public class ClientWriter extends Thread {
 	    byte[] message;
 	    while (!isInterrupted()) {
 
-		message = messageQueue.take();
-		outputStream.write(message);
+		message = this.messageQueue.take();
+		this.outputStream.write(message);
 	    }
 	} catch (InterruptedException | IOException e) {
 	    e.printStackTrace();
@@ -29,7 +29,7 @@ public class ClientWriter extends Thread {
     }
 
     public void addMessage(final byte[] message) {
-	messageQueue.offer(message);
+	this.messageQueue.offer(message);
     }
 
     public void close() {
